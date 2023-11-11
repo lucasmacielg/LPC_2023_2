@@ -12,18 +12,17 @@ target = "ME THINKS IT IS LIKE A WEASEL"
 
 initial_string = "".join(choice(letters) for _ in target)
 assert len(initial_string) == len(target)
-dist = calculate_distance(target, initial_string)
+distance = calculate_distance(target, initial_string)
 generation = 0
 for n in range(10000):
-    place = randrange(len(initial_string))
-    mutant = initial_string[:place] + choice(letters) + initial_string[place + 1:]
-
-    assert len(initial_string) == len(mutant)
+    modif_caracter = randrange(len(initial_string))
+    mutant = initial_string[:modif_caracter] + choice(letters) + initial_string[modif_caracter + 1:]
 
     mdist = calculate_distance(target, mutant)
-    if mdist < dist:
-        initial_string, dist = mutant, mdist
+
+    if mdist < distance:
+        initial_string, distance = mutant, mdist
         generation += 1
-        print(generation, n, ":", initial_string)
+        print("generation:", generation, "mutant number:", n, ":", initial_string)
         if mutant == target:
             break
