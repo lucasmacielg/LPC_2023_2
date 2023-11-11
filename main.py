@@ -6,7 +6,7 @@ def calculate_distance(string1, string2):
     return sum(c1 != c2 for c1, c2 in zip(string1, string2))
 
 
-letters = string.ascii_letters + " "
+letters = string.ascii_uppercase + " "
 
 target = "ME THINKS IT IS LIKE A WEASEL"
 
@@ -17,6 +17,8 @@ generation = 0
 for n in range(10000):
     modif_caracter = randrange(len(initial_string))
     mutant = initial_string[:modif_caracter] + choice(letters) + initial_string[modif_caracter + 1:]
+
+    assert len(initial_string) == len(mutant)
 
     mdist = calculate_distance(target, mutant)
 
