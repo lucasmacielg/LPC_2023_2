@@ -8,7 +8,7 @@ def calculate_distance(string1, string2):
 
 letters = string.ascii_uppercase + " "
 
-target = "ME THINKS IT IS LIKE A WEASEL"
+target = "METHINKS IT IS LIKE A WEASEL"
 
 initial_string = "".join(choice(letters) for _ in target)
 assert len(initial_string) == len(target)
@@ -18,13 +18,11 @@ for n in range(10000):
     modif_caracter = randrange(len(initial_string))
     mutant = initial_string[:modif_caracter] + choice(letters) + initial_string[modif_caracter + 1:]
 
-    assert len(initial_string) == len(mutant)
-
     mdist = calculate_distance(target, mutant)
 
     if mdist < distance:
         initial_string, distance = mutant, mdist
         generation += 1
         print("generation:", generation, "mutant number:", n, ":", initial_string)
-        if mutant == target:
+        if distance == 0:
             break
