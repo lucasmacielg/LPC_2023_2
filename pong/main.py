@@ -17,6 +17,8 @@ BALL_RADIUS = 17
 FONT = pygame.font.Font('assets/PressStart2P.ttf', 70)
 WINNING_SCORE = 2
 
+restart = False
+
 
 class Paddle:
     COLOR = WHITE
@@ -195,14 +197,15 @@ def main():
             pygame.display.update()
             pygame.time.delay(5000)
 
-            for event in pygame.event.get():
-                if event.type == pygame.K_SPACE:
-                    ball.reset()
-                    left_paddle.reset()
-                    right_paddle.reset()
-                    left_score = 0
-                    right_score = 0
-                    pygame.display.update()
+            if restart:
+                for event in pygame.event.get():
+                    if event.type == pygame.K_SPACE:
+                        ball.reset()
+                        left_paddle.reset()
+                        right_paddle.reset()
+                        left_score = 0
+                        right_score = 0
+                        pygame.display.update()
     pygame.quit()
 
 
