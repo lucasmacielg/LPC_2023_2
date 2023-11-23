@@ -14,20 +14,8 @@ FPS = 60
 PADDLE_WIDTH, PADDLE_HEIGHT = 40, 200
 BALL_RADIUS = 17
 
-SCORE_FONT = pygame.font.SysFont("comicsans", 50)
-WINNING_SCORE = 5
-
-# score text
-score_font = pygame.font.Font('assets/PressStart2P.ttf', 44)
-score_text = score_font.render('00 x 00', True, WHITE, BLACK)
-score_text_rect = score_text.get_rect()
-score_text_rect.center = (680, 50)
-
-# victory text
-victory_font = pygame.font.Font('assets/PressStart2P.ttf', 100)
-victory_text = victory_font.render('VICTORY', True, WHITE, BLACK)
-victory_text_rect = score_text.get_rect()
-victory_text_rect.center = (450, 350)
+FONT = pygame.font.Font('assets/PressStart2P.ttf', 70)
+WINNING_SCORE = 2
 
 
 class Paddle:
@@ -83,8 +71,8 @@ class Ball:
 def draw(screen, paddles, ball, left_score, right_score):
     screen.fill(BLACK)
 
-    left_score_text = SCORE_FONT.render(f"{left_score}", 1, WHITE)
-    right_score_text = SCORE_FONT.render(f"{right_score}", 1, WHITE)
+    left_score_text = FONT.render(f"{left_score}", 1, WHITE)
+    right_score_text = FONT.render(f"{right_score}", 1, WHITE)
     screen.blit(left_score_text, (WIDTH // 4 - left_score_text.get_width() // 2, 20))
     screen.blit(right_score_text, (WIDTH * (3 / 4) -
                                    right_score_text.get_width() // 2, 20))
@@ -153,6 +141,7 @@ def main():
 
     left_score = 0
     right_score = 0
+    win = False
 
     while game_loop:
         scoring_sound = pygame.mixer.Sound('assets/258020__kodack__arcade-bleep-sound.wav')
@@ -174,39 +163,46 @@ def main():
         handle_collision(ball, left_paddle, right_paddle)
 
         if ball.x < 0:
-            scoring_sound.play()
             right_score += 1
             ball.reset()
-
-        elif ball.x > WIDTH:
             scoring_sound.play()
+        elif ball.x > WIDTH:
             left_score += 1
             ball.reset()
+            scoring_sound.play()
 
-        win = False
-
-        if left_score == WINNING_SCORE:
-            win = True
-            screen_text = "PLAYER 1 WON!"
+        won = False
+        if left_score >= WINNING_SCORE:
+            won = True
+            win_text = "PLAYER 1 WIN!"
             victory_sound.play()
 
-        elif right_score == WINNING_SCORE:
-            win = True
-            screen_text = "PLAYER 2 WON!"
+        elif right_score >= WINNING_SCORE:
+            won = True
+            win_text = "PLAYER 2 WIN!"
             defeat_sound.play()
 
-        elif win:
-            text = SCORE_FONT.render(screen_text, 1, WHITE)
+        if won:
+            text = FONT.render(win_text, 1, WHITE)
+            play_again_font = pygame.font.Font('assets/PressStart2P.ttf', 40)
+            text_play_again = "PRESS SPACE TO PLAY AGAIN"
+            play_again_text = play_again_font.render(text_play_again, 1, WHITE)
             SCREEN.blit(text, (WIDTH // 2 - text.get_width() //
-                               2, HEIGHT // 2 - text.get_height() // 2))
+                               2, HEIGHT // 2 - text.get_height() // 2 - 100))
+            SCREEN.blit(play_again_text, (WIDTH // 2 - play_again_text.get_width() //
+                                          2, HEIGHT // 2 - play_again_text.get_height() // 2 + 200))
+
             pygame.display.update()
             pygame.time.delay(5000)
-            ball.reset()
-            left_paddle.reset()
-            right_paddle.reset()
-            left_score = 0
-            right_score = 0
 
+            for event in pygame.event.get():
+                if event.type == pygame.K_SPACE:
+                    ball.reset()
+                    left_paddle.reset()
+                    right_paddle.reset()
+                    left_score = 0
+                    right_score = 0
+                    pygame.display.update()
     pygame.quit()
 
 
