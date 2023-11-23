@@ -183,18 +183,19 @@ def main():
             left_score += 1
             ball.reset()
 
-        won = False
+        win = False
 
         if left_score == WINNING_SCORE:
-            won = True
+            win = True
             screen_text = "PLAYER 1 WON!"
             victory_sound.play()
+
         elif right_score == WINNING_SCORE:
-            won = True
+            win = True
             screen_text = "PLAYER 2 WON!"
             defeat_sound.play()
 
-        elif won:
+        elif win:
             text = SCORE_FONT.render(screen_text, 1, WHITE)
             SCREEN.blit(text, (WIDTH // 2 - text.get_width() //
                                2, HEIGHT // 2 - text.get_height() // 2))
