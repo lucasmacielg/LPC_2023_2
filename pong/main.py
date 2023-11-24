@@ -17,8 +17,6 @@ BALL_RADIUS = 17
 FONT = pygame.font.Font('assets/PressStart2P.ttf', 70)
 WINNING_SCORE = 2
 
-restart = False
-
 
 class Paddle:
     COLOR = WHITE
@@ -94,31 +92,27 @@ def handle_collision(ball, left_paddle, right_paddle):
     elif ball.y - ball.radius <= 0:
         ball.y_vel *= -1
 
-    if ball.x_vel < 0:
-        if ball.y >= left_paddle.y:
-            if ball.y <= left_paddle.y + left_paddle.height:
-                if ball.x - ball.radius <= left_paddle.x + left_paddle.width:
-                    ball.x_vel *= -1
+    if (ball.x_vel < 0 and left_paddle.x <= ball.x - ball.radius <= left_paddle.x + left_paddle.width and left_paddle.y
+            <= ball.y <= left_paddle.y + left_paddle.height):
+        ball.x_vel *= -1
 
-                    middle_y = left_paddle.y + left_paddle.height / 2
-                    difference_in_y = middle_y - ball.y
-                    reduction_factor = (left_paddle.height / 2) / ball.MAX_VEL
-                    y_vel = difference_in_y / reduction_factor
-                    ball.y_vel = -1 * y_vel
-                    bounce_sound_effect.play()
+        middle_y = left_paddle.y + left_paddle.height / 2
+        difference_in_y = middle_y - ball.y
+        reduction_factor = (left_paddle.height / 2) / ball.MAX_VEL
+        y_vel = difference_in_y / reduction_factor
+        ball.y_vel = -1 * y_vel
+        bounce_sound_effect.play()
 
-    else:
+    elif (ball.x_vel > 0 and right_paddle.x <= ball.x + ball.radius <= right_paddle.x + right_paddle.width and
+          right_paddle.y <= ball.y <= right_paddle.y + right_paddle.height):
+        ball.x_vel *= -1
 
-        if ball.y >= right_paddle.y:
-            if ball.y <= right_paddle.y + right_paddle.height:
-                if ball.x + ball.radius >= right_paddle.x:
-                    ball.x_vel *= -1
-                    middle_y = right_paddle.y + right_paddle.height / 2
-                    difference_in_y = middle_y - ball.y
-                    reduction_factor = (right_paddle.height / 2) / ball.MAX_VEL
-                    y_vel = difference_in_y / reduction_factor
-                    ball.y_vel = -1 * y_vel
-                    bounce_sound_effect.play()
+        middle_y = right_paddle.y + right_paddle.height / 2
+        difference_in_y = middle_y - ball.y
+        reduction_factor = (right_paddle.height / 2) / ball.MAX_VEL
+        y_vel = difference_in_y / reduction_factor
+        ball.y_vel = -1 * y_vel
+        bounce_sound_effect.play()
 
 
 def movement(keys, left_paddle, right_paddle):
@@ -133,6 +127,26 @@ def movement(keys, left_paddle, right_paddle):
         right_paddle.move(up=False)
 
 
+def restart_game():
+    restart = True
+    pygame.mixer.music.stop()
+    play_again_font = pygame.font.Font('assets/PressStart2P.ttf', 40)
+    text_play_again = "PRESS SPACE TO PLAY AGAIN"
+    play_again_text = play_again_font.render(text_play_again, 1, WHITE)
+    SCREEN.blit(play_again_text,
+                (WIDTH // 2 - play_again_text.get_width() // 2, HEIGHT // 2 - play_again_text.get_height()
+                 // 2 + 200))
+    pygame.display.update()
+
+    while restart:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                quit()
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
+                restart = False
+
+
 def main():
     game_loop = True
     clock = pygame.time.Clock()
@@ -143,12 +157,11 @@ def main():
 
     left_score = 0
     right_score = 0
-    win = False
 
     while game_loop:
-        scoring_sound = pygame.mixer.Sound('assets/258020__kodack__arcade-bleep-sound.wav')
-        victory_sound = pygame.mixer.Sound('assets/mario_kart_win.wav')
-        defeat_sound = pygame.mixer.Sound('assets/super-mario-dies.wav')
+        scoring_sound = pygame.mixer.Sound('assets/scoring_music.wav')
+        victory_sound = pygame.mixer.Sound('assets/win_music.wav')
+        defeat_sound = pygame.mixer.Sound('assets/lose_music.wav')
 
         clock.tick(FPS)
         draw(SCREEN, [left_paddle, right_paddle], ball, left_score, right_score)
@@ -156,7 +169,14 @@ def main():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 game_loop = False
-                break
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
+                restart_game()
+                ball.reset()
+                left_paddle.reset()
+                right_paddle.reset()
+                left_score = 0
+                right_score = 0
+                pygame.display.update()
 
         keys = pygame.key.get_pressed()
         movement(keys, left_paddle, right_paddle)
@@ -164,49 +184,28 @@ def main():
         ball.move()
         handle_collision(ball, left_paddle, right_paddle)
 
-        if ball.x < 0:
+        if ball.x < 0 and ball.x_vel < 0:
             right_score += 1
             ball.reset()
             scoring_sound.play()
-        elif ball.x > WIDTH:
+        elif ball.x > WIDTH and ball.x_vel > 0:
             left_score += 1
             ball.reset()
             scoring_sound.play()
 
         won = False
-        if left_score >= WINNING_SCORE:
+        if left_score == WINNING_SCORE:
             won = True
-            win_text = "PLAYER 1 WIN!"
-            victory_sound.play()
-
-        elif right_score >= WINNING_SCORE:
+            win_text = "PLAYER 1 WINS!"
+        elif right_score == WINNING_SCORE:
             won = True
-            win_text = "PLAYER 2 WIN!"
-            defeat_sound.play()
+            win_text = "PLAYER 2 WINS!"
 
         if won:
+            victory_sound.play() if left_score == WINNING_SCORE else defeat_sound.play()
             text = FONT.render(win_text, 1, WHITE)
-            play_again_font = pygame.font.Font('assets/PressStart2P.ttf', 40)
-            text_play_again = "PRESS SPACE TO PLAY AGAIN"
-            play_again_text = play_again_font.render(text_play_again, 1, WHITE)
-            SCREEN.blit(text, (WIDTH // 2 - text.get_width() //
-                               2, HEIGHT // 2 - text.get_height() // 2 - 100))
-            SCREEN.blit(play_again_text, (WIDTH // 2 - play_again_text.get_width() //
-                                          2, HEIGHT // 2 - play_again_text.get_height() // 2 + 200))
-
-            pygame.display.update()
-            pygame.time.delay(5000)
-
-            if restart:
-                for event in pygame.event.get():
-                    if event.type == pygame.K_SPACE:
-                        ball.reset()
-                        left_paddle.reset()
-                        right_paddle.reset()
-                        left_score = 0
-                        right_score = 0
-                        pygame.display.update()
-    pygame.quit()
+            SCREEN.blit(text, (WIDTH // 2 - text.get_width() // 2, HEIGHT // 2 - text.get_height() // 2 - 100))
+            restart_game()
 
 
 if __name__ == '__main__':
