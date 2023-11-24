@@ -1,3 +1,5 @@
+import sys
+
 import pygame
 
 pygame.init()
@@ -16,6 +18,7 @@ BALL_RADIUS = 17
 
 FONT = pygame.font.Font('assets/PressStart2P.ttf', 70)
 WINNING_SCORE = 2
+restart = False
 
 
 class Paddle:
@@ -90,7 +93,6 @@ def collision(ball, left_paddle, right_paddle):
     elif ball.y - ball.radius <= 0:
         ball.y_vel *= -1
 
-
     if ball.x_vel < 0:
         if ball.y >= left_paddle.y and ball.y <= left_paddle.y + left_paddle.height:
             if ball.x - ball.radius <= left_paddle.x + left_paddle.width:
@@ -128,56 +130,48 @@ def movement(keys, left_paddle, right_paddle):
         right_paddle.move(up=False)
 
 
-def restart_game():
-    restart = True
-    pygame.mixer.music.stop()
-    play_again_font = pygame.font.Font('assets/PressStart2P.ttf', 40)
-    text_play_again = "PRESS SPACE TO PLAY AGAIN"
-    play_again_text = play_again_font.render(text_play_again, 1, WHITE)
-    SCREEN.blit(play_again_text,
-                (WIDTH // 2 - play_again_text.get_width() // 2, HEIGHT // 2 - play_again_text.get_height()
-                 // 2 + 200))
-    pygame.display.update()
-
-    while restart:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                quit()
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
-                restart = False
+def restart_game(ball, left_paddle, right_paddle, left_score, right_score):
+    ball.reset()
+    left_paddle.reset()
+    right_paddle.reset()
+    left_score = 0
+    right_score = 0
+    return ball, left_paddle, right_paddle, left_score, right_score
 
 
 def main():
     game_loop = True
     clock = pygame.time.Clock()
+    start_time = pygame.time.get_ticks()
 
     left_paddle = Paddle(10, HEIGHT // 2 - PADDLE_HEIGHT // 2, PADDLE_WIDTH, PADDLE_HEIGHT)
     right_paddle = Paddle(WIDTH - 10 - PADDLE_WIDTH, HEIGHT // 2 - PADDLE_HEIGHT // 2, PADDLE_WIDTH, PADDLE_HEIGHT)
     ball = Ball(WIDTH // 2, HEIGHT // 2, BALL_RADIUS)
 
+    won = False
     left_score = 0
     right_score = 0
+    restart_text_font = pygame.font.Font('assets/PressStart2P.ttf', 40)
+    restart_text = restart_text_font.render("PRESS SPACE TO RESTART", 1, WHITE)
 
     while game_loop:
         scoring_sound = pygame.mixer.Sound('assets/scoring_music.wav')
         victory_sound = pygame.mixer.Sound('assets/win_music.wav')
         defeat_sound = pygame.mixer.Sound('assets/lose_music.wav')
 
+        current_time = pygame.time.get_ticks()
+        elapsed_time = current_time - start_time
         clock.tick(FPS)
         draw(SCREEN, [left_paddle, right_paddle], ball, left_score, right_score)
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 game_loop = False
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
-                restart_game()
-                ball.reset()
-                left_paddle.reset()
-                right_paddle.reset()
-                left_score = 0
-                right_score = 0
-                pygame.display.update()
+
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_SPACE:
+                    ball, left_paddle, right_paddle, left_score, right_score = restart_game(
+                        ball, left_paddle, right_paddle, left_score, right_score)
 
         keys = pygame.key.get_pressed()
         movement(keys, left_paddle, right_paddle)
@@ -194,7 +188,6 @@ def main():
             ball.reset()
             scoring_sound.play()
 
-        won = False
         if left_score == WINNING_SCORE:
             won = True
             win_text = "PLAYER 1 WINS!"
@@ -203,10 +196,29 @@ def main():
             win_text = "PLAYER 2 WINS!"
 
         if won:
+            SCREEN.fill(BLACK)
+            SCREEN.blit(restart_text, (WIDTH // 2 - restart_text.get_width() // 2, HEIGHT // 2 -
+                        restart_text.get_height() // 2 + 200))
             victory_sound.play() if left_score == WINNING_SCORE else defeat_sound.play()
             text = FONT.render(win_text, 1, WHITE)
             SCREEN.blit(text, (WIDTH // 2 - text.get_width() // 2, HEIGHT // 2 - text.get_height() // 2 - 100))
-            restart_game()
+            won = False
+            pygame.display.update()
+            
+            space_pressed = False
+            while not space_pressed:
+                for event in pygame.event.get():
+                    if event.type == pygame.QUIT:
+                        game_loop = False
+                        space_pressed = True
+
+                    if event.type == pygame.KEYDOWN:
+                        if event.key == pygame.K_SPACE:
+                            ball, left_paddle, right_paddle, left_score, right_score = restart_game(
+                                ball, left_paddle, right_paddle, left_score, right_score)
+                            draw(SCREEN, [left_paddle, right_paddle], ball, left_score, right_score)
+                            pygame.display.update()
+                            space_pressed = True
 
 
 if __name__ == '__main__':
