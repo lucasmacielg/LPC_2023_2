@@ -74,8 +74,7 @@ def draw(screen, paddles, ball, left_score, right_score):
     left_score_text = FONT.render(f"{left_score}", 1, WHITE)
     right_score_text = FONT.render(f"{right_score}", 1, WHITE)
     screen.blit(left_score_text, (WIDTH // 4 - left_score_text.get_width() // 2, 20))
-    screen.blit(right_score_text, (WIDTH * (3 / 4) -
-                                   right_score_text.get_width() // 2, 20))
+    screen.blit(right_score_text, (WIDTH * (3 / 4) - right_score_text.get_width() // 2, 20))
 
     for paddle in paddles:
         paddle.draw(screen)
@@ -92,27 +91,28 @@ def handle_collision(ball, left_paddle, right_paddle):
     elif ball.y - ball.radius <= 0:
         ball.y_vel *= -1
 
-    if (ball.x_vel < 0 and left_paddle.x <= ball.x - ball.radius <= left_paddle.x + left_paddle.width and left_paddle.y
-            <= ball.y <= left_paddle.y + left_paddle.height):
-        ball.x_vel *= -1
+    if ball.x_vel < 0:
+        if ball.y >= left_paddle.y and ball.y <= left_paddle.y + left_paddle.height:
+            if ball.x - ball.radius <= left_paddle.x + left_paddle.width:
+                ball.x_vel *= -1
+                bounce_sound_effect.play()
+                middle_y = left_paddle.y + left_paddle.height / 2
+                difference_in_y = middle_y - ball.y
+                reduction_factor = (left_paddle.height / 2) / ball.MAX_VEL
+                y_vel = difference_in_y / reduction_factor
+                ball.y_vel = -1 * y_vel
 
-        middle_y = left_paddle.y + left_paddle.height / 2
-        difference_in_y = middle_y - ball.y
-        reduction_factor = (left_paddle.height / 2) / ball.MAX_VEL
-        y_vel = difference_in_y / reduction_factor
-        ball.y_vel = -1 * y_vel
-        bounce_sound_effect.play()
+    else:
+        if ball.y >= right_paddle.y and ball.y <= right_paddle.y + right_paddle.height:
+            if ball.x + ball.radius >= right_paddle.x:
+                ball.x_vel *= -1
+                bounce_sound_effect.play()
+                middle_y = left_paddle.y + left_paddle.height / 2
+                difference_in_y = middle_y - ball.y
+                reduction_factor = (left_paddle.height / 2) / ball.MAX_VEL
+                y_vel = difference_in_y / reduction_factor
+                ball.y_vel = -1 * y_vel
 
-    elif (ball.x_vel > 0 and right_paddle.x <= ball.x + ball.radius <= right_paddle.x + right_paddle.width and
-          right_paddle.y <= ball.y <= right_paddle.y + right_paddle.height):
-        ball.x_vel *= -1
-
-        middle_y = right_paddle.y + right_paddle.height / 2
-        difference_in_y = middle_y - ball.y
-        reduction_factor = (right_paddle.height / 2) / ball.MAX_VEL
-        y_vel = difference_in_y / reduction_factor
-        ball.y_vel = -1 * y_vel
-        bounce_sound_effect.play()
 
 
 def movement(keys, left_paddle, right_paddle):
