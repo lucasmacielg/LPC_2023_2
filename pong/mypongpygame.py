@@ -1,7 +1,9 @@
 import pygame
 import sys
 from button import Button
-from main import main
+from back import main
+from back import robot_playing
+from back import not_robot_playing
 
 pygame.init()
 BLACK = (0, 0, 0)
@@ -26,6 +28,7 @@ def play():
 def main_menu():
     while True:
         SCREEN.blit(BG, (0, 0))
+        pygame.mixer.music.pause()
 
         MENU_MOUSE_POS = pygame.mouse.get_pos()
 
@@ -51,7 +54,13 @@ def main_menu():
 
         for event in pygame.event.get():
             if event.type == pygame.MOUSEBUTTONDOWN:
-                if ONE_PLAYER_BUTTON.checkForInput(MENU_MOUSE_POS) or TWO_PLAYER_BUTTON.checkForInput(MENU_MOUSE_POS):
+                if ONE_PLAYER_BUTTON.checkForInput(MENU_MOUSE_POS):
+                    robot_playing()
+                    pygame.mixer.music.play()
+                    play()
+                if TWO_PLAYER_BUTTON.checkForInput(MENU_MOUSE_POS):
+                    not_robot_playing()
+                    pygame.mixer.music.play()
                     play()
                 if QUIT_BUTTON.checkForInput(MENU_MOUSE_POS):
                     pygame.quit()
