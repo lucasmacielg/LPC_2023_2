@@ -184,6 +184,8 @@ defeat_sound = pygame.mixer.Sound('assets/lose_music.wav')
 pygame.mixer.music.play(-1)
 pygame.mixer.music.set_volume(0.4)
 scoring_sound.set_volume(volume)
+victory_sound.set_volume(volume)
+defeat_sound.set_volume(volume)
 
 
 def main():
@@ -222,13 +224,13 @@ def main():
         ball.move()
         collision(ball, left_paddle, right_paddle)
 
-        if ball.x < 0 and ball.x_vel < 0:
+        if ball.x + ball.radius < 0 and ball.x_vel < 0:
             right_score += 1
             ball.reset()
             scoring_sound.play()
             right_paddle.y = HEIGHT // 2 - PADDLE_HEIGHT // 2
             left_paddle.y = HEIGHT // 2 - PADDLE_HEIGHT // 2
-        elif ball.x > WIDTH and ball.x_vel > 0:
+        elif ball.x + ball.radius > WIDTH and ball.x_vel > 0:
             left_score += 1
             ball.reset()
             scoring_sound.play()
