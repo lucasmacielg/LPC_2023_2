@@ -166,7 +166,7 @@ def restart_game(ball, left_paddle, right_paddle):
     return ball, left_paddle, right_paddle, left_score, right_score
 
 
-pygame.mixer.music.load("assets/throught_the_wire.wav")
+pygame.mixer.music.load("assets/runaway.wav")
 scoring_sound = pygame.mixer.Sound('assets/point.wav')
 victory_sound = pygame.mixer.Sound('assets/win_music.wav')
 defeat_sound = pygame.mixer.Sound('assets/lose_music.wav')
@@ -202,6 +202,7 @@ def main():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 game_loop = False
+
 
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE:
