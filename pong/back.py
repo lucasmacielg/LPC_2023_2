@@ -1,5 +1,4 @@
 import pygame
-import random
 
 pygame.init()
 
@@ -12,7 +11,7 @@ pygame.display.set_caption("Pong Game")
 
 FPS = 60
 
-PADDLE_WIDTH, PADDLE_HEIGHT = 30, 130
+PADDLE_WIDTH, PADDLE_HEIGHT = 20, 130
 BALL_RADIUS = 17
 
 FONT = pygame.font.Font('assets/font.ttf', 70)
@@ -24,7 +23,7 @@ volume = 0.3
 
 class Paddle:
     COLOR = WHITE
-    VEL = 4
+    VEL = 5
 
     def __init__(self, x, y, width, height):
         self.x = self.original_x = x
@@ -136,22 +135,12 @@ def not_robot_playing():
 
 
 def move_ai_paddle(ai_paddle, ball):
-    if ball.x >= WIDTH / 2:
+    target_y = ball.y
 
-        target_y = ball.y + (ball.y_vel / ball.x_vel) * (ai_paddle.x - ball.x)
-
-        if ai_paddle.y + ai_paddle.height / 2 < target_y:
-            ai_paddle.move(up=False)
-        elif ai_paddle.y + ai_paddle.height / 2 > target_y:
-            ai_paddle.move(up=True)
-
-        ai_paddle.y = max(0, min(ai_paddle.y, HEIGHT - ai_paddle.height))
-    else:
-        target_y = ball.y + random.randint(-20, 20)
-        if ai_paddle.y + ai_paddle.height / 2 < target_y and ai_paddle.y < HEIGHT - ai_paddle.height:
-            ai_paddle.move(up=False)
-        elif ai_paddle.y + ai_paddle.height / 2 > target_y and ai_paddle.y > 0:
-            ai_paddle.move(up=True)
+    if ai_paddle.y + ai_paddle.height / 2 < target_y - 20:
+        ai_paddle.move(up=False)
+    elif ai_paddle.y + ai_paddle.height / 2 > target_y + 20:
+        ai_paddle.move(up=True)
 
     ai_paddle.y = max(0, min(ai_paddle.y, HEIGHT - ai_paddle.height))
 
@@ -177,11 +166,10 @@ def restart_game(ball, left_paddle, right_paddle):
     return ball, left_paddle, right_paddle, left_score, right_score
 
 
-pygame.mixer.music.load("assets/runaway.wav")
+pygame.mixer.music.load("assets/throught_the_wire.wav")
 scoring_sound = pygame.mixer.Sound('assets/point.wav')
 victory_sound = pygame.mixer.Sound('assets/win_music.wav')
 defeat_sound = pygame.mixer.Sound('assets/lose_music.wav')
-pygame.mixer.music.play(-1)
 pygame.mixer.music.set_volume(0.4)
 scoring_sound.set_volume(volume)
 victory_sound.set_volume(volume)
@@ -191,6 +179,7 @@ defeat_sound.set_volume(volume)
 def main():
     game_loop = True
     clock = pygame.time.Clock()
+    pygame.mixer.music.play(-1)
 
     left_paddle = Paddle(30, HEIGHT // 2 - PADDLE_HEIGHT // 2, PADDLE_WIDTH, PADDLE_HEIGHT)
     right_paddle = Paddle(WIDTH - 30 - PADDLE_WIDTH, HEIGHT // 2 - PADDLE_HEIGHT // 2, PADDLE_WIDTH, PADDLE_HEIGHT)
@@ -224,20 +213,20 @@ def main():
         ball.move()
         collision(ball, left_paddle, right_paddle)
 
-        if ball.x + ball.radius < 0 and ball.x_vel < 0:
+        if ball.x + ball.radius < 0:
             right_score += 1
             ball.reset()
             scoring_sound.play()
             right_paddle.y = HEIGHT // 2 - PADDLE_HEIGHT // 2
             left_paddle.y = HEIGHT // 2 - PADDLE_HEIGHT // 2
-        elif ball.x + ball.radius > WIDTH and ball.x_vel > 0:
+        elif ball.x + ball.radius > WIDTH:
             left_score += 1
             ball.reset()
             scoring_sound.play()
             left_paddle.y = HEIGHT // 2 - PADDLE_HEIGHT // 2
             right_paddle.y = HEIGHT // 2 - PADDLE_HEIGHT // 2
 
-        win_text = ""
+        win_text = " "
         if left_score == WINNING_SCORE:
             won = True
             win_text = "PLAYER 1 WINS!"
@@ -245,7 +234,7 @@ def main():
 
         elif ai_playing and right_score == WINNING_SCORE:
             won = True
-            win_text = "IA WINS!"
+            win_text = "AI WINS!"
             defeat_sound.play()
         elif not ai_playing and right_score == WINNING_SCORE:
             won = True
@@ -268,6 +257,7 @@ def main():
                     if event.type == pygame.QUIT:
                         game_loop = False
                         space_pressed = True
+                        pygame.mixer.pause()
 
                     if event.type == pygame.KEYDOWN:
                         if event.key == pygame.K_SPACE:
