@@ -170,7 +170,7 @@ pygame.mixer.music.load("assets/throught_the_wire.wav")
 scoring_sound = pygame.mixer.Sound('assets/point.wav')
 victory_sound = pygame.mixer.Sound('assets/win_music.wav')
 defeat_sound = pygame.mixer.Sound('assets/lose_music.wav')
-pygame.mixer.music.set_volume(0.4)
+pygame.mixer.music.set_volume(0.3)
 scoring_sound.set_volume(volume)
 victory_sound.set_volume(volume)
 defeat_sound.set_volume(volume)
@@ -192,7 +192,6 @@ def main():
     restart_text = restart_text_font.render("PRESS SPACE TO RESTART", 1, WHITE)
 
     while game_loop:
-
         if ai_playing:
             move_ai_paddle(right_paddle, ball)
 

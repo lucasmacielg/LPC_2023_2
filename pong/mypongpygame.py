@@ -16,6 +16,10 @@ pygame.display.set_caption("Pong Game")
 BG = pygame.image.load("assets/Background.png")
 surface = pygame.display.set_mode((WIDTH, HEIGHT))
 
+volume = 0.3
+select = pygame.mixer.Sound('assets/select.wav')
+select.set_volume(volume)
+
 
 def get_font(size):
     return pygame.font.Font("assets/font.ttf", size)
@@ -56,10 +60,14 @@ def main_menu():
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if ONE_PLAYER_BUTTON.checkForInput(MENU_MOUSE_POS):
                     robot_playing()
+                    select.play()
+                    pygame.time.delay(200)
                     pygame.mixer.music.play()
                     play()
                 if TWO_PLAYER_BUTTON.checkForInput(MENU_MOUSE_POS):
                     not_robot_playing()
+                    select.play()
+                    pygame.time.delay(200)
                     pygame.mixer.music.play()
                     play()
                 if QUIT_BUTTON.checkForInput(MENU_MOUSE_POS):
