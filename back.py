@@ -166,11 +166,11 @@ def restart_game(ball, left_paddle, right_paddle):
     return ball, left_paddle, right_paddle, left_score, right_score
 
 
-pygame.mixer.music.load("assets/runaway.wav")
+pygame.mixer.music.load("assets/i_wonder.wav")
 scoring_sound = pygame.mixer.Sound('assets/point.wav')
 victory_sound = pygame.mixer.Sound('assets/win_music.wav')
 defeat_sound = pygame.mixer.Sound('assets/lose_music.wav')
-pygame.mixer.music.set_volume(0.4)
+pygame.mixer.music.set_volume(0.3)
 scoring_sound.set_volume(volume)
 victory_sound.set_volume(volume)
 defeat_sound.set_volume(volume)
@@ -192,7 +192,6 @@ def main():
     restart_text = restart_text_font.render("PRESS SPACE TO RESTART", 1, WHITE)
 
     while game_loop:
-
         if ai_playing:
             move_ai_paddle(right_paddle, ball)
 
@@ -202,7 +201,6 @@ def main():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 game_loop = False
-
 
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE:
