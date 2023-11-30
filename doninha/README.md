@@ -1,0 +1,2 @@
+# LPC-2023_2
+LUCAS MACIEL GOMES 2315310014 lmg.snf23@uea.edu.br
