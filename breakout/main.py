@@ -83,7 +83,7 @@ class Ball:
 
 def draw(screen, paddles, ball, score):
     screen.fill(BLACK)
-    score_text = FONT.render(f"{score}", 1, TEXT_COLOR)
+    score_text = FONT.render(f"{score}", True, TEXT_COLOR)
     screen.blit(score_text, (WIDTH - 100 - score_text.get_width() // 2, 40))
 
     for paddle in paddles:
@@ -147,7 +147,7 @@ def main():
     won = False
     score = 000
     restart_text_font = pygame.font.Font('assets/font.ttf', 20)
-    restart_text = restart_text_font.render("PRESS SPACE TO RESTART", 1, WHITE)
+    restart_text = restart_text_font.render("PRESS SPACE TO RESTART", True, WHITE)
 
     while game_loop:
 
@@ -183,7 +183,7 @@ def main():
             SCREEN.fill(BLACK)
             SCREEN.blit(restart_text, (WIDTH // 2 - restart_text.get_width() // 2, HEIGHT // 2 -
                                        restart_text.get_height() // 2 + 200))
-            text = FONT.render(win_text, 1, WHITE)
+            text = FONT.render(win_text, True, WHITE)
             SCREEN.blit(text, (WIDTH // 2 - text.get_width() // 2, HEIGHT // 2 - text.get_height() // 2 - 100))
             won = False
             pygame.display.update()
